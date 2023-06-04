@@ -10,10 +10,10 @@ RSpec.describe "amusement park show page", type: :feature do
     @amusement_park_1 = AmusementPark.create!(name: "Six Flags", admission_cost: 75)
     @amusement_park_2 = AmusementPark.create!(name: "Knotts Berry Farm", admission_cost: 50)
 
-    @ride_1 = @amusement_park_1.rides.create!(name: "The Hurler", thrill_rating: 7, open: false)
-    @ride_2 = @amusement_park_1.rides.create!(name: "The Frog Hopper", thrill_rating: 5, open: false)
-    @ride_3 = @amusement_park_1.rides.create!(name: "Fahrenheit", thrill_rating: 4, open: false)
-    @ride_4 = @amusement_park_1.rides.create!(name: "The Kiss Raise", thrill_rating: 1, open: false)
+    @ride_1 = @amusement_park_1.rides.create!(name: "The Hurler", thrill_rating: 7, open: false) # 11
+    @ride_2 = @amusement_park_1.rides.create!(name: "The Frog Hopper", thrill_rating: 5, open: false) # 8.5
+    @ride_3 = @amusement_park_1.rides.create!(name: "Fahrenheit", thrill_rating: 4, open: false) # 6
+    @ride_4 = @amusement_park_1.rides.create!(name: "The Kiss Raise", thrill_rating: 1, open: false) # 9.66
 
     @ride_5 = @amusement_park_2.rides.create!(name: "The Ride", thrill_rating: 7, open: false)
     @ride_6 = @amusement_park_2.rides.create!(name: "The Other Ride", thrill_rating: 5, open: false)
@@ -23,8 +23,12 @@ RSpec.describe "amusement park show page", type: :feature do
     @mechanic_1_ride_1 = MechanicRide.create!(mechanic_id: @mechanic_1.id, ride_id: @ride_1.id)
     @mechanic_1_ride_2 = MechanicRide.create!(mechanic_id: @mechanic_1.id, ride_id: @ride_2.id)
     @mechanic_1_ride_3 = MechanicRide.create!(mechanic_id: @mechanic_1.id, ride_id: @ride_3.id)
+    @mechanic_1_ride_4 = MechanicRide.create!(mechanic_id: @mechanic_1.id, ride_id: @ride_3.id)
 
     @mechanic_2_ride_4 = MechanicRide.create!(mechanic_id: @mechanic_2.id, ride_id: @ride_4.id)
+    @mechanic_3_ride_2 = MechanicRide.create!(mechanic_id: @mechanic_3.id, ride_id: @ride_2.id)
+    @mechanic_3_ride_4 = MechanicRide.create!(mechanic_id: @mechanic_3.id, ride_id: @ride_4.id)
+    @mechanic_4_ride_3 = MechanicRide.create!(mechanic_id: @mechanic_4.id, ride_id: @ride_3.id)
 
     @mechanic_3_ride_5 = MechanicRide.create!(mechanic_id: @mechanic_3.id, ride_id: @ride_5.id)
     @mechanic_3_ride_6 = MechanicRide.create!(mechanic_id: @mechanic_3.id, ride_id: @ride_6.id)
@@ -49,8 +53,28 @@ RSpec.describe "amusement park show page", type: :feature do
             expect(page).to have_content("Mechanics working at Park:")
             expect(page).to have_content(@mechanic_1.name)
             expect(page).to have_content(@mechanic_2.name)
-            expect(page).to_not have_content(@mechanic_3.name)
-            expect(page).to_not have_content(@mechanic_4.name)
+            # expect(page).to_not have_content(@mechanic_3.name)
+            # expect(page).to_not have_content(@mechanic_4.name)
+            ## removed above 2 mechanics ^ because they now show with revised test data
+          end
+        end
+
+        it "displays a list of park ride ordered by average experience of mechanics working on that ride" do
+          visit amusement_park_path(@amusement_park_1)
+
+          within "#amusement-park-rides" do
+            expect(page).to have_content("Park Rides and Mechanics' Average Experience:")
+            # @ride_1 # 11
+            # @ride_2 # 8.5
+            # @ride_3 # 6
+            # @ride_4 # 9.66
+            expect(@ride_3.name).to appear_before(@ride_2.name)
+            expect(@ride_2.name).to appear_before(@ride_4.name)
+            expect(@ride_4.name).to appear_before(@ride_1.name)
+            expect(page).to have_content("#{@ride_3.name} - 6")
+            expect(page).to have_content("#{@ride_2.name} - 8.5")
+            expect(page).to have_content("#{@ride_4.name} - 9.66")
+            expect(page).to have_content("#{@ride_1.name} - 11")
           end
         end
       end

@@ -8,3 +8,10 @@
     <% end %>
   </ul>
 </div>
+<div id=amusement-park-rides><h3>Park Rides and Mechanics' Average Experience:</h3>
+  <ul>
+    <% @amusement_park_mechanics.each do |mechanic| %>
+      <li><%= mechanic.name %></li>
+    <% end %>
+  </ul>
+</div>
